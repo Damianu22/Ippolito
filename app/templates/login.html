@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Login · IppolitoPisaniApp{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+{% endblock %}
+
+{% block content %}
+	<section class="auth-section">
+		<div class="auth-card" role="form" aria-label="Modulo di accesso">
+			<img
+				src="{{ url_for('static', filename='images/ippolito.png') }}"
+				alt="Logo Ippolito Pisani"
+				class="auth-logo"
+			/>
+
+			<form method="post" novalidate>
+				<div class="form-field">
+					<input
+						type="text"
+						id="username"
+						name="username"
+						required
+						autocomplete="username"
+						placeholder="Username"
+						aria-label="Username"
+					/>
+				</div>
+
+				<div class="form-field">
+					<input
+						type="password"
+						id="password"
+						name="password"
+						required
+						autocomplete="current-password"
+						placeholder="Password"
+						aria-label="Password"
+					/>
+				</div>
+
+				<button type="submit" class="primary-button">Accedi</button>
+			</form>
+		</div>
+	</section>
+{% endblock %}

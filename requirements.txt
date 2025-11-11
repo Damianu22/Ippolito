@@ -1,0 +1,9 @@
+# Setup (run these manually in your terminal):
+# python -m venv venv
+# venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
+# pip install -r requirements.txt
+
+flask==3.0.3
+python-dotenv==1.0.1
+pyodbc==5.1.0

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="ie=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{% block title %}IppolitoPisaniApp{% endblock %}</title>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" />
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+		{% block extra_css %}{% endblock %}
+	</head>
+	<body>
+			{% block header %}
+				<header class="app-header">
+					<div class="container header-content">
+						<a class="brand" href="{{ url_for('main.dashboard') if g.get('user') else url_for('main.login') }}">
+							IppolitoPisaniApp
+						</a>
+						<nav class="primary-nav">
+							{% if g.get('user') %}
+								<span class="welcome">Ciao, {{ g.user }}!</span>
+								<a class="link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+								<a class="link" href="{{ url_for('main.logout') }}">Logout</a>
+							{% else %}
+								<a class="link" href="{{ url_for('main.login') }}">Login</a>
+							{% endif %}
+						</nav>
+					</div>
+				</header>
+			{% endblock %}
+
+		<main class="app-main container">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					<div class="flash-wrapper" role="status">
+						{% for category, message in messages %}
+							<div class="flash flash-{{ category }}">{{ message }}</div>
+						{% endfor %}
+					</div>
+				{% endif %}
+			{% endwith %}
+
+			{% block content %}{% endblock %}
+		</main>
+
+				{% block footer %}
+					<footer class="app-footer">
+						<div class="container">
+							<small>&copy; 2025 IppolitoPisaniApp. Tutti i diritti riservati.</small>
+						</div>
+					</footer>
+				{% endblock %}
+
+		<script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+		{% block extra_js %}{% endblock %}
+	</body>
+</html>

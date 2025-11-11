@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Clienti · IppolitoPisaniApp{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/vista_clienti.css') }}" />
+{% endblock %}
+
+{# Rimuove header e footer blu per questa pagina #}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+  <section class="clients-section container">
+    <header class="clients-header">
+      <h1>Clienti</h1>
+      <div class="controls">
+        <input type="search" placeholder="Cerca cliente..." id="client-search" aria-label="Cerca cliente">
+      </div>
+    </header>
+
+    <div class="clients-card card">
+      <table class="clients-table" aria-describedby="clients-list">
+        <thead>
+          <tr>
+            <th>Codice</th>
+            <th>Nome</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if clients %}
+            {% for c in clients %}
+              <tr>
+                <td>{{ c.code }}</td>
+                <td>{{ c.name }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr class="empty-row"><td colspan="2">Nessun cliente disponibile.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="clients-footer">
+      <small>Mostrate {{ clients|length if clients else 0 }} voci</small>
+    </footer>
+  </section>
+{% endblock %}

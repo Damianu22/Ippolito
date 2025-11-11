@@ -1,0 +1,75 @@
+/* Styles for the clients listing view */
+.clients-section {
+  padding: 2rem 0 3.5rem;
+}
+
+.clients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.clients-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.controls input[type="search"] {
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(15,23,42,0.08);
+  font-size: 0.95rem;
+}
+
+.clients-card {
+  padding: 0.75rem;
+}
+
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.clients-table thead th {
+  text-align: left;
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  background: rgba(15,23,42,0.02);
+}
+
+.clients-table tbody td {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid rgba(15,23,42,0.04);
+}
+
+.clients-table tr.empty-row td {
+  text-align: center;
+  color: rgba(15,23,42,0.5);
+  padding: 2rem 1rem;
+}
+
+.clients-footer {
+  margin-top: 1rem;
+  color: rgba(15,23,42,0.6);
+}
+
+/* Small screens */
+@media (max-width: 640px) {
+  .clients-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls { width: 100%; }
+  .controls input[type="search"] { width: 100%; }
+}
