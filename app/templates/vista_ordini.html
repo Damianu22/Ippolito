@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Ordini Cliente · IppolitoPisaniApp{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/vista_ordini.css') }}" />
+{% endblock %}
+
+{# Rimuove header e footer blu per questa pagina #}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+  <section class="orders-section container">
+    <header class="orders-header">
+      <div class="header-content">
+        <a href="{{ url_for('main.vista_clienti') }}" class="back-link">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+          Torna ai Clienti
+        </a>
+        <h1>Ordini {{ cliente_nome }}</h1>
+      </div>
+      <div class="controls">
+        <form method="GET" action="{{ url_for('main.vista_ordini', rifconto=rifconto) }}" class="search-form">
+          <input 
+            type="search" 
+            name="q" 
+            value="{{ search_text }}"
+            placeholder="Cerca ordine..." 
+            id="order-search" 
+            aria-label="Cerca ordine"
+            class="search-input">
+          <button type="submit" class="search-button">Cerca</button>
+        </form>
+      </div>
+    </header>
+
+    <div class="orders-grid">
+      {% if ordini %}
+        {% for ordine in ordini %}
+          <a href="{{ url_for('main.articoli_ordine', rifconto=rifconto, numdoc_raw=ordine.numdoc_raw) }}" class="order-card-link">
+            <div class="order-card">
+              <div class="order-header">
+                <h3 class="order-number">
+                  <svg class="icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+                  </svg>
+                  Ordine N° {{ ordine.numdoc }}
+                </h3>
+                <span class="order-date">
+                  <svg class="icon" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                  </svg>
+                  {% if ordine.datdoc %}
+                    {{ ordine.datdoc.strftime('%d/%m/%Y') if ordine.datdoc is not string else ordine.datdoc }}
+                  {% else %}
+                    Data non disponibile
+                  {% endif %}
+                </span>
+              </div>
+              
+              <div class="order-details">
+                <div class="detail-row">
+                  <span class="detail-label">Pratica:</span>
+                  <span class="detail-value">{{ ordine.pratica_numero if ordine.pratica_numero else 'N/A' }}</span>
+                </div>
+                
+                <div class="detail-row article-description">
+                  <span class="detail-label">Articolo:</span>
+                  <span class="detail-value">{{ ordine.desart if ordine.desart else 'N/A' }}</span>
+                </div>
+                
+                {% if ordine.num_articoli > 1 %}
+                <div class="detail-row articles-count">
+                  <span class="detail-label">Articoli:</span>
+                  <span class="detail-value badge">{{ ordine.num_articoli }} articoli</span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <svg class="empty-icon" width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+          </svg>
+          <p>Nessun ordine trovato per questo cliente.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <footer class="orders-footer">
+      <small>Trovati {{ ordini|length if ordini else 0 }} ordini</small>
+    </footer>
+  </section>
+{% endblock %}

@@ -32,19 +32,21 @@
     <div class="clients-grid">
       {% if clients %}
         {% for c in clients %}
-          <div class="client-card">
-            <h3 class="client-name">{{ c.ragsoc }}</h3>
-            <p class="client-city">
-              {% if c.citta %}
-                <svg class="icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
-                </svg>
-                {{ c.citta }}
-              {% else %}
-                <span class="text-muted">Città non specificata</span>
-              {% endif %}
-            </p>
-          </div>
+          <a href="{{ url_for('main.vista_ordini', rifconto=c.rifconto) }}" class="client-card-link">
+            <div class="client-card">
+              <h3 class="client-name">{{ c.ragsoc }}</h3>
+              <p class="client-city">
+                {% if c.citta %}
+                  <svg class="icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                  </svg>
+                  {{ c.citta }}
+                {% else %}
+                  <span class="text-muted">Città non specificata</span>
+                {% endif %}
+              </p>
+            </div>
+          </a>
         {% endfor %}
       {% else %}
         <div class="empty-state">

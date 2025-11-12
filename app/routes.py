@@ -20,7 +20,7 @@ from flask import (
 
 import pyodbc
 
-from .db import fetch_user_by_username, get_clients
+from .db import fetch_user_by_username, get_clients, get_ordini_cliente, get_cliente_nome, get_articoli_ordine
 
 
 main_bp = Blueprint("main", __name__)
@@ -117,6 +117,81 @@ def vista_clienti() -> Response:
 		title="Clienti",
 		clients=clients,
 		search_text=search_text
+	)
+
+
+@main_bp.route("/clienti/<rifconto>/ordini")
+@login_required
+def vista_ordini(rifconto: str) -> Response:
+	"""Render orders listing for a specific client.
+
+	Parameters
+	----------
+	rifconto: str
+		Client's Rifconto code from piacon table.
+
+	Query parameters:
+	- q: search text (optional, for future filtering)
+	"""
+
+	search_text = request.args.get("q", "").strip()
+
+	# Get client name
+	cliente_nome = get_cliente_nome(rifconto) or f"Cliente {rifconto}"
+
+	try:
+		ordini = get_ordini_cliente(codcf=rifconto)
+	except pyodbc.Error:
+		current_app.logger.exception("Errore durante il caricamento degli ordini per cliente '%s'", rifconto)
+		ordini = []
+		flash("Impossibile recuperare gli ordini in questo momento.", "error")
+
+	return render_template(
+		"vista_ordini.html",
+		title=f"Ordini {cliente_nome}",
+		ordini=ordini,
+		cliente_nome=cliente_nome,
+		rifconto=rifconto,
+		search_text=search_text
+	)
+
+
+@main_bp.route("/clienti/<rifconto>/ordini/<numdoc_raw>/articoli")
+@login_required
+def articoli_ordine(rifconto: str, numdoc_raw: str) -> Response:
+	"""Render articles listing for a specific order.
+
+	Parameters
+	----------
+	rifconto: str
+		Client's Rifconto code.
+	numdoc_raw: str
+		Raw NUMDOC value to fetch all articles for this order.
+	"""
+
+	# Get client name
+	cliente_nome = get_cliente_nome(rifconto) or f"Cliente {rifconto}"
+
+	try:
+		articoli = get_articoli_ordine(codcf=rifconto, numdoc_raw=numdoc_raw)
+		
+		# Get formatted numdoc from first article if available
+		numdoc_formatted = articoli[0]["numdoc"] if articoli else numdoc_raw
+		
+	except pyodbc.Error:
+		current_app.logger.exception("Errore durante il caricamento degli articoli per ordine '%s'", numdoc_raw)
+		articoli = []
+		numdoc_formatted = numdoc_raw
+		flash("Impossibile recuperare gli articoli in questo momento.", "error")
+
+	return render_template(
+		"articoli_ordine.html",
+		title=f"Articoli Ordine {numdoc_formatted}",
+		articoli=articoli,
+		cliente_nome=cliente_nome,
+		rifconto=rifconto,
+		numdoc_formatted=numdoc_formatted,
+		numdoc_raw=numdoc_raw
 	)
 
 
