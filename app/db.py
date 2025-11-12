@@ -149,84 +149,109 @@ def fetch_user_by_username(username: str) -> Optional[Dict[str, object]]:
 
 def get_clients(
 	filtro_mastro: Optional[str] = None,
-	mostra_disattivati: bool = True,
+	mostra_disattivati: bool = False,
 	pattern_ricerca: Optional[str] = None,
 	match_anywhere: bool = True,
 ) -> List[Dict[str, object]]:
-	"""Return a list of clients from table ``piacon``.
+	"""Fetch clients from piacon with same logic as desktop EstraiDati.
 
-	This implements the core of the earlier-provided query semantics while
-	defaulting to "show all" on first load. To maximize compatibility across
-	installations, we always select the two canonical fields and fill optional
-	fields in Python.
+	Desktop query logic:
+	- FROM piacon LEFT JOIN bancheapp ON piacon.banca = bancheapp.codice
+	- LEFT JOIN PAGAMENTI ON piacon.PAGAMENTO = PAGAMENTI.Codice
+	- WHERE ragsoc > ' ' AND codice <> '0000' AND Rifconto LIKE 'filtroMastro%'
+	- AND (disattivato condition based on chktutte)
+	- AND (search in ragsoc, denominazione, citta, partitaiva, codfisc)
+	- ORDER BY Ragsoc
+
+	For web app we only need: Ragsoc (concatenated with denominazione) and Citta.
 
 	Parameters
 	----------
 	filtro_mastro: Optional[str]
-		Optional filter prefix for the ``MASTRO`` account (e.g. "C"/"F"). If ``None``,
-		no filtering by mastro is applied.
+		Prefix for Rifconto (e.g., "C" for clienti, "F" for fornitori).
 	mostra_disattivati: bool
-		When ``False``, filters out deactivated rows if a ``DISATTIVATO``/``DISA`` flag exists.
+		If True, include deactivated records (chktutte checked in desktop).
 	pattern_ricerca: Optional[str]
-		Optional search pattern to match by code or name. When provided, applies a
-		LIKE filter either prefix or anywhere depending on ``match_anywhere``.
+		Search text to filter across multiple fields.
 	match_anywhere: bool
-		If ``True``, wraps the pattern with wildcards on both sides; otherwise uses
-		prefix matching.
+		If True, use LIKE '%text%' (chklike checked), else LIKE 'text%'.
 
 	Returns
 	-------
 	List[Dict[str, object]]
-		List of client dicts with keys: ``code``, ``name``, ``province``, ``phone``.
+		Each dict has: ragsoc (concatenated), citta.
 	"""
 
-	# Base, widely compatible query (selects canonical identifiers only)
-	base_query = "SELECT CODCON AS code, RAGSO1 AS name FROM piacon"
-	where_clauses = []
-	params: List[object] = []
+	filtro_val = (filtro_mastro or "").strip()
+	if not filtro_val:
+		# If no filter provided, match all
+		rifconto_like = "%"
+	else:
+		rifconto_like = f"{filtro_val}%"
 
-	# Optional filters — guarded to avoid schema-specific columns where possible.
-	if filtro_mastro:
-		# Apply mastro filter if a MASTRO-like column exists; keep generic by using LIKE
-		where_clauses.append("MASTRO LIKE ?")
-		params.append(f"{filtro_mastro}%")
+	search_raw = (pattern_ricerca or "").strip()
+	if not search_raw:
+		pattern_like = "%"
+	else:
+		# Desktop uses [ as placeholder, then replaces with % or empty
+		# chklike.Checked -> replace [ with %  (match anywhere)
+		# else -> replace [ with empty (prefix match)
+		pattern_like = f"%{search_raw}%" if match_anywhere else f"{search_raw}%"
 
-	if not mostra_disattivati:
-		# Try to filter out deactivated rows if a flag exists; this may be ignored
-		# by the database if column doesn't exist. To stay safe, we won't reference
-		# the column here; instead, rely on full query upgrades later when schema is confirmed.
-		pass
-
-	if pattern_ricerca:
-		pattern = pattern_ricerca.strip()
-		if pattern:
-			like = f"%{pattern}%" if match_anywhere else f"{pattern}%"
-			where_clauses.append("(CODCON LIKE ? OR RAGSO1 LIKE ?)")
-			params.extend([like, like])
-
-	query = base_query
-	if where_clauses:
-		query += " WHERE " + " AND ".join(where_clauses)
-	query += " ORDER BY RAGSO1"
-
-	rows: List[Dict[str, object]] = []
+	results: List[Dict[str, object]] = []
 	try:
 		with get_configured_connection() as connection:
 			cursor = connection.cursor()
+
+			# Build SQL matching desktop logic
+			# Desktop uses CONCAT for SQL Server
+			ragsoc_expr = "CONCAT(piacon.Ragsoc, ' ', piacon.denominazione) AS Ragsoc"
+			citta_expr = "piacon.Citta"
+
+			# Desktop query includes LEFT JOINs but we only need piacon for ragsoc/citta
+			query = f"""
+				SELECT {ragsoc_expr}, {citta_expr}
+				FROM piacon
+				LEFT JOIN bancheapp ON piacon.banca = bancheapp.codice
+				LEFT JOIN PAGAMENTI ON piacon.PAGAMENTO = PAGAMENTI.Codice
+				WHERE piacon.Ragsoc > ' '
+				  AND piacon.codice <> '0000'
+				  AND piacon.Rifconto LIKE ?
+			"""
+
+			params: List[object] = [rifconto_like]
+
+			# Disattivato condition (from desktop condizione2)
+			if not mostra_disattivati:
+				# Desktop: " AND ISNULL(piacon.disattivato,0) = 0 "
+				query += " AND ISNULL(piacon.disattivato, 0) = 0"
+
+			# Search condition (from desktop condizione)
+			# Desktop searches: ragsoc, denominazione, citta, partitaIVA, codfisc
+			query += """
+				  AND (
+				      piacon.Ragsoc LIKE ? OR
+				      piacon.denominazione LIKE ? OR
+				      piacon.citta LIKE ? OR
+				      piacon.partitaIVA LIKE ? OR
+				      piacon.codfisc LIKE ?
+				  )
+			"""
+			# Add pattern 5 times (one for each searchable column)
+			params.extend([pattern_like] * 5)
+
+			# Order by (desktop uses "order by Ragsoc")
+			query += " ORDER BY Ragsoc"
+
 			cursor.execute(query, params)
-			columns = [column[0] for column in cursor.description]
 			for rec in cursor.fetchall():
-				row = dict(zip(columns, rec))
-				# Normalize expected keys for the template
-				rows.append(
-					{
-						"code": row.get("code"),
-						"name": row.get("name"),
-						"province": "",  # filled later if needed
-						"phone": "",  # filled later if needed
-					}
-				)
-		return rows
+				results.append({
+					"ragsoc": rec[0] if rec[0] else "",
+					"citta": rec[1] if rec[1] else ""
+				})
+
+			return results
+
 	except pyodbc.Error as exc:  # pragma: no cover - depends on external DB
-		logger.error("Database error while fetching clients: %s", exc)
+		logger.error("Database error while fetching clients (desktop-compatible query): %s", exc)
 		raise

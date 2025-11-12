@@ -90,21 +90,34 @@ def dashboard() -> Response:
 @main_bp.route("/clienti")
 @login_required
 def vista_clienti() -> Response:
-	"""Render a simple clients listing view. Currently returns an empty list.
+	"""Render clients listing - shows only active clients (Rifconto prefix '01').
 
-	This is a stub: later we can fetch real clients from the database and pass
-	them to the template as a list of dicts with keys (code, name, province, phone).
+	Query parameters:
+	- q: search text (optional)
 	"""
 
-	# Carica tutti i clienti al primo accesso (nessun filtro).
+	# Get search text from query string
+	search_text = request.args.get("q", "").strip()
+
 	try:
-		clients = get_clients()
+		# Always show only clients (prefix '01'), exclude deactivated, match anywhere
+		clients = get_clients(
+			filtro_mastro="01",  # Hardcoded for clienti only
+			mostra_disattivati=False,  # Always exclude deactivated
+			pattern_ricerca=search_text if search_text else None,
+			match_anywhere=True  # Always match anywhere in search
+		)
 	except pyodbc.Error:
 		current_app.logger.exception("Errore durante il caricamento dei clienti")
 		clients = []
 		flash("Impossibile recuperare i clienti in questo momento.", "error")
 
-	return render_template("vista_clienti.html", title="Clienti", clients=clients)
+	return render_template(
+		"vista_clienti.html",
+		title="Clienti",
+		clients=clients,
+		search_text=search_text
+	)
 
 
 @main_bp.route("/logout")

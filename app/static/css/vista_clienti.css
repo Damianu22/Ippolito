@@ -1,75 +1,195 @@
-/* Styles for the clients listing view */
+/* Styles for the clients listing view with card layout */
 .clients-section {
   padding: 2rem 0 3.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .clients-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .clients-header h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 700;
+  color: #0f172a;
 }
 
 .controls {
   display: flex;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.search-form {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(15,23,42,0.15);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-button {
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-button:hover {
+  background: #2563eb;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-.controls input[type="search"] {
-  padding: 0.6rem 0.9rem;
-  border-radius: 0.6rem;
-  border: 1px solid rgba(15,23,42,0.08);
-  font-size: 0.95rem;
+.checkbox-label,
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
 }
 
-.clients-card {
-  padding: 0.75rem;
+.checkbox-label input[type="checkbox"],
+.radio-label input[type="radio"] {
+  cursor: pointer;
 }
 
-.clients-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+/* Card Grid Layout */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.clients-table thead th {
-  text-align: left;
+.client-card {
+  background: white;
+  border: 1px solid rgba(15,23,42,0.1);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.client-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.client-name {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
   font-weight: 600;
-  padding: 0.85rem 1rem;
-  background: rgba(15,23,42,0.02);
+  color: #0f172a;
+  line-height: 1.4;
 }
 
-.clients-table tbody td {
-  padding: 0.85rem 1rem;
-  border-top: 1px solid rgba(15,23,42,0.04);
+.client-city {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #64748b;
 }
 
-.clients-table tr.empty-row td {
+.client-city .icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.client-city .text-muted {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
   text-align: center;
-  color: rgba(15,23,42,0.5);
-  padding: 2rem 1rem;
+  padding: 4rem 2rem;
+  color: #64748b;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .clients-footer {
-  margin-top: 1rem;
-  color: rgba(15,23,42,0.6);
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(15,23,42,0.08);
+  color: #64748b;
+  font-size: 0.9rem;
 }
 
-/* Small screens */
-@media (max-width: 640px) {
-  .clients-header {
-    flex-direction: column;
-    align-items: flex-start;
+/* Responsive */
+@media (max-width: 768px) {
+  .clients-header h1 {
+    font-size: 1.5rem;
   }
 
-  .controls { width: 100%; }
-  .controls input[type="search"] { width: 100%; }
+  .clients-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .filter-controls {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-section {
+    padding: 1rem 0 2rem;
+  }
+
+  .clients-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
 }
