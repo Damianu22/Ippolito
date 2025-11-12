@@ -92,6 +92,14 @@
   margin-bottom: 2rem;
 }
 
+.client-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
 .client-card {
   background: white;
   border: 1px solid rgba(15,23,42,0.1);
@@ -99,9 +107,11 @@
   padding: 1.5rem;
   transition: all 0.2s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  cursor: pointer;
+  height: 100%;
 }
 
-.client-card:hover {
+.client-card-link:hover .client-card {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border-color: rgba(59, 130, 246, 0.3);
   transform: translateY(-2px);

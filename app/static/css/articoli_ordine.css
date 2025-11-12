@@ -1,0 +1,228 @@
+/* Styles for the articles listing view with card layout */
+.articles-section {
+  padding: 2rem 0 3.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.articles-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s;
+  width: fit-content;
+}
+
+.back-link:hover {
+  color: #2563eb;
+}
+
+.back-link svg {
+  flex-shrink: 0;
+}
+
+.articles-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.client-info {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.client-info strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Articles Grid Layout */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.article-card {
+  background: white;
+  border: 1px solid rgba(15,23,42,0.1);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.article-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(15,23,42,0.08);
+}
+
+.article-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.article-title .icon {
+  flex-shrink: 0;
+  color: #3b82f6;
+}
+
+.article-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.article-date .icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.article-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #475569;
+  min-width: 90px;
+}
+
+.detail-value {
+  color: #0f172a;
+  flex: 1;
+}
+
+.article-description .detail-value {
+  font-style: italic;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.article-code .detail-value.code {
+  font-family: 'Courier New', Courier, monospace;
+  background: rgba(59, 130, 246, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.85rem;
+  color: #1e40af;
+  display: inline-block;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.empty-state .empty-icon {
+  opacity: 0.3;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.articles-footer {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(15,23,42,0.08);
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .articles-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .articles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .article-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .article-date {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .articles-section {
+    padding: 1rem 0 2rem;
+  }
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .detail-label {
+    min-width: auto;
+  }
+}
