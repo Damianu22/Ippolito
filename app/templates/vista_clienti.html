@@ -15,35 +15,46 @@
     <header class="clients-header">
       <h1>Clienti</h1>
       <div class="controls">
-        <input type="search" placeholder="Cerca cliente..." id="client-search" aria-label="Cerca cliente">
+        <form method="GET" action="{{ url_for('main.vista_clienti') }}" class="search-form">
+          <input 
+            type="search" 
+            name="q" 
+            value="{{ search_text }}"
+            placeholder="Cerca per nome, città, P.IVA, CF..." 
+            id="client-search" 
+            aria-label="Cerca cliente"
+            class="search-input">
+          <button type="submit" class="search-button">Cerca</button>
+        </form>
       </div>
     </header>
 
-    <div class="clients-card card">
-      <table class="clients-table" aria-describedby="clients-list">
-        <thead>
-          <tr>
-            <th>Codice</th>
-            <th>Nome</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if clients %}
-            {% for c in clients %}
-              <tr>
-                <td>{{ c.code }}</td>
-                <td>{{ c.name }}</td>
-              </tr>
-            {% endfor %}
-          {% else %}
-            <tr class="empty-row"><td colspan="2">Nessun cliente disponibile.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
+    <div class="clients-grid">
+      {% if clients %}
+        {% for c in clients %}
+          <div class="client-card">
+            <h3 class="client-name">{{ c.ragsoc }}</h3>
+            <p class="client-city">
+              {% if c.citta %}
+                <svg class="icon" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                </svg>
+                {{ c.citta }}
+              {% else %}
+                <span class="text-muted">Città non specificata</span>
+              {% endif %}
+            </p>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>Nessun cliente trovato.</p>
+        </div>
+      {% endif %}
     </div>
 
     <footer class="clients-footer">
-      <small>Mostrate {{ clients|length if clients else 0 }} voci</small>
+      <small>Trovati {{ clients|length if clients else 0 }} risultati</small>
     </footer>
   </section>
 {% endblock %}
